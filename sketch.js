@@ -14,124 +14,160 @@ let initialCell = null;
 
 let Cells = [];
 
+let Heads = [];
+
+let newListB;
+
+
+// function to disable default menu on right click
+// https://discourse.processing.org/t/using-right-mouse-without-context-menu/9379/3
+document.oncontextmenu = function() {
+  return false;
+}
+
+
+
 function preload() {
-	font = loadFont('assets/Typori-Regular.ttf');
+  font = loadFont('assets/Typori-Regular.ttf');
 }
 
 function setup() {
-	createCanvas(windowWidth, windowHeight);
-	textFont(font);
-	BACKGROUND = color(20);
-	DRAWING_COLOR = color(220);
+  createCanvas(windowWidth, windowHeight);
+  textFont(font);
+  BACKGROUND = color(20);
+  DRAWING_COLOR = color(220);
 
-	L1 = new List(100, 100, "45", DRAWING_COLOR);
-	L2 = new List(width / 2, height / 2, "123", DRAWING_COLOR);
-	L1.setNext(L2);
+  L1 = new List(100, 100, 45, DRAWING_COLOR);
+  L2 = new List(width / 2, height / 2, 123, DRAWING_COLOR);
+  L1.setNext(L2);
 
-	Cells.push(L1);
-	Cells.push(L2);
-	Cells.push(new List(400, 400, "hey", DRAWING_COLOR));
+  Cells.push(L1);
+  Cells.push(L2);
+  Cells.push(new List(400, 400, 22, DRAWING_COLOR));
+
+  Heads.push(new Head(200, 200, "L", DRAWING_COLOR))
+
+  newListB = new NewListTile(width / 2, height - 50);
 }
 
 function draw() {
-	background(BACKGROUND);
+  background(BACKGROUND);
 
-	showCells();
-	if (isCreatePointer) {
-		initialCell.drawLinkTo(mouseX, mouseY, initialCell.color);
-	}
-	// L1.show();
-	// L2.show();
+  newListB.show();
 
-	// if (L2.isOnValue(mouseX, mouseY))
-	// 	L2.color = color(255, 0, 0);
-	// else {
-	// 	L2.color = DRAWING_COLOR;
-	// }
-	//
-	//
-	// if (L1.isOn(mouseX, mouseY))
-	// 	L1.color = color(0, 255, 0);
-	// else {
-	// 	L1.color = DRAWING_COLOR;
-	// }
-
+  showCells();
+  showHeads();
+  if (isCreatePointer) {
+    initialCell.drawLinkTo(mouseX, mouseY, initialCell.color);
+  }
 
 }
 
 
 function mousePressed() {
-	let c = isOnValueCell(mouseX, mouseY);
-	if (c != null) {
-		isDraggingCell = true;
-		draggingCell = c;
-	}
+  let c = isOnValueCell(mouseX, mouseY);
+  if (c != null) {
+    isDraggingCell = true;
+    draggingCell = c;
+  } else {
 
-	c = isOnPointerCell(mouseX, mouseY);
-	if (c != null) {
-		isCreatePointer = true;
-		initialCell = c;
-	}
+    c = isOnPointerCell(mouseX, mouseY);
+    if (c != null) {
+      isCreatePointer = true;
+      initialCell = c;
+    } else {
+      if (!newListB.isOn(mouseX, mouseY))
+        Cells.push(new List(mouseX, mouseY, floor(1 + random(20)), DRAWING_COLOR));
+    }
+
+  }
 }
 
 function mouseDragged() {
-	if (isDraggingCell) {
-		draggingCell.setPositionAt(mouseX, mouseY);
-	}
+  if (isDraggingCell) {
+    draggingCell.setPositionAt(mouseX, mouseY);
+  }
 }
 
 
 function mouseReleased() {
-	draggingCell = null;
-	isDraggingCell = false;
+  draggingCell = null;
+  isDraggingCell = false;
 
-	if (isCreatePointer) {
-		let c = isOnCell(mouseX, mouseY);
-		if (c != null) {
-			if (c == initialCell) {
-				initialCell.setNext(null);
-			} else {
-				initialCell.setNext(c);
-			}
-		}
+  if (isCreatePointer) {
+    let c = isOnCell(mouseX, mouseY);
+    if (c != null) {
+      if (c == initialCell) {
+        initialCell.setNext(null);
+      } else {
+        initialCell.setNext(c);
+      }
+    }
 
-	}
+  }
 
-	isCreatePointer = false;
-	initialCell = null;
+  isCreatePointer = false;
+  initialCell = null;
 
+}
+
+function mouseWheel() {
+  let c = isOnValueCell(mouseX, mouseY);
+  if (c != null) {
+    if (event.delta > 0) {
+      c.updateValue(max(0, c.v - 1));
+    } else {
+      c.updateValue(min(99, c.v + 1));
+    }
+  }
 }
 
 function isOnValueCell(x, y) {
-	for (let c of Cells) {
-		if (c.isOnValue(x, y)) {
-			return c;
-		}
-	}
-	return null;
+  for (let c of Cells) {
+    if (c.isOnValue(x, y)) {
+      return c;
+    }
+  }
+  return null;
 }
 
 function isOnPointerCell(x, y) {
-	for (let c of Cells) {
-		if (c.isOnPointer(x, y)) {
-			return c;
-		}
-	}
-	return null;
+  for (let c of Cells) {
+    if (c.isOnPointer(x, y)) {
+      return c;
+    }
+  }
+  return null;
 }
 
 function isOnCell(x, y) {
-	for (let c of Cells) {
-		if (c.isOn(x, y)) {
-			return c;
-		}
-	}
-	return null;
+  for (let c of Cells) {
+    if (c.isOn(x, y)) {
+      return c;
+    }
+  }
+  return null;
+}
+
+
+function isOnHead(x, y) {
+  for (let h of Heads) {
+    if (h.isOn(x, y)) {
+      return h;
+    }
+  }
 }
 
 
 function showCells() {
-	for (let c of Cells) {
-		c.show();
-	}
+  for (let c of Cells) {
+    c.show();
+  }
+}
+
+
+function showHeads() {
+  for (let h of Heads) {
+    h.show();
+  }
 }
