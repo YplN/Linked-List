@@ -106,7 +106,7 @@ class ResetTile extends Tile {
 
 class NewListTile extends Tile {
   constructor(x, y, t) {
-    super(x, y, "L = listechainee()");
+    super(x, y, " L" + (Heads.length + 1) + " = listechainee() ");
   }
 }
 

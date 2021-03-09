@@ -5,9 +5,6 @@ let RESULT_COLOR;
 
 let font;
 
-let L1;
-let L2;
-
 let isDraggingCell = false;
 let draggingCell = null;
 
@@ -50,35 +47,36 @@ function setup() {
   ALERT_COLOR = color(191, 110, 110);
   RESULT_COLOR = color(50, 110, 190);
 
-  // L1 = new List(100, 100, 45, DRAWING_COLOR);
-  // L2 = new List(width / 2, height / 2, 123, DRAWING_COLOR);
-  // L1.setNext(L2);
-
-  Cells.push(new List(400, 200, 45, DRAWING_COLOR));
-  Cells.push(new List(600, 200, 25, DRAWING_COLOR));
-  Cells.push(new List(800, 350, 6, DRAWING_COLOR));
-  Cells.push(new List(1000, 350, 78, DRAWING_COLOR));
-  Cells.push(new List(500, 500, 42, DRAWING_COLOR));
-  // Cells.push(L2);
+  Cells.push(new List(400, 0.3 * height, 45, DRAWING_COLOR));
+  Cells.push(new List(600, 0.3 * height, 25, DRAWING_COLOR));
+  Cells.push(new List(800, 0.3 * height, 6, DRAWING_COLOR));
+  Cells.push(new List(1000, 0.3 * height, 78, DRAWING_COLOR));
+  Cells.push(new List(500, 0.6 * height, 42, DRAWING_COLOR));
+  Cells.push(new List(800, 0.6 * height, 54, DRAWING_COLOR));
 
   Cells[0].setNext(Cells[1]);
   Cells[1].setNext(Cells[2]);
   Cells[2].setNext(Cells[3]);
-  Cells[4].setNext(Cells[2]);
+  // Cells[4].setNext(Cells[2]);
+  Cells[4].setNext(Cells[5]);
 
-  Heads.push(new Head(200, 200, "L1", DRAWING_COLOR));
-  Heads.push(new Head(200, 500, "L2", DRAWING_COLOR));
+  Heads.push(new Head(200, 0.3 * height, "L1", DRAWING_COLOR));
+  Heads.push(new Head(200, 0.6 * height, "L2", DRAWING_COLOR));
 
   Heads[0].setNext(Cells[0]);
   Heads[1].setNext(Cells[4]);
 
-  newListB = new NewListTile(width / 2, height - 20);
-  newNodeB = new NewNodeTile(width / 2 + 200, height + 50);
 
   menuHeads = new Menu(80, height - 20, "      tête[L]      ", Heads, "tête[X]");
   menuKey = new Menu(menuHeads.x + menuHeads.w / 2 + 78, height - 20, "      cle[x]      ", Heads, "cle[tête[X]]");
   menuNext = new Menu(menuKey.x + menuKey.w / 2 + 84, height - 20, "      succ[x]      ", Heads, "succ[tête[X]]");
+
+  newListB = new NewListTile(menuNext.x + 200, height - 20);
+  newNodeB = new NewNodeTile(width / 2 + 200, height + 50);
+
 }
+
+
 
 function draw() {
   background(BACKGROUND);
@@ -129,6 +127,17 @@ function updateResult(x, y) {
     ResultCellsNexts = [];
   }
 
+  if (menuKey.isOn(mouseX, mouseY)) {
+    if (SelectedCells.length == 1 && SelectedCells[0] instanceof List) {
+      ResultCellsKeys = [SelectedCells[0]];
+    }
+  }
+
+  if (menuNext.isOn(mouseX, mouseY)) {
+    if (SelectedCells.length == 1 && SelectedCells[0] instanceof List) {
+      ResultCellsNexts = [SelectedCells[0].next];
+    }
+  }
 
 }
 
@@ -151,28 +160,40 @@ function mousePressed() {
         if (menuNext.showing && i != null && menuNext.isShowing) {
           SelectedCells = [];
         } else {
-          let c = isOnValueCell(mouseX, mouseY);
-          if (c != null) {
-            isDraggingCell = true;
-            draggingCell = c;
+          if (menuKey.isOn(mouseX, mouseY)) {
+            if (SelectedCells.length == 1 && SelectedCells[0] instanceof List) {
+              ResultCellsKeys = [];
+            }
+          } else
+          if (menuNext.isOn(mouseX, mouseY)) {
+            if (SelectedCells.length == 1 && SelectedCells[0] instanceof List) {
+              ResultCellsNexts = [];
+              SelectedCells = [SelectedCells[0].next];
+            }
           } else {
-            c = isOnPointerCell(mouseX, mouseY);
+            let c = isOnValueCell(mouseX, mouseY);
             if (c != null) {
-              isCreatePointer = true;
-              initialCell = c;
+              isDraggingCell = true;
+              draggingCell = c;
             } else {
-              c = isOnHeadPointer(mouseX, mouseY);
+              c = isOnPointerCell(mouseX, mouseY);
               if (c != null) {
                 isCreatePointer = true;
                 initialCell = c;
               } else {
-                c = isOnHeadValue(mouseX, mouseY);
+                c = isOnHeadPointer(mouseX, mouseY);
                 if (c != null) {
-                  isDraggingCell = true;
-                  draggingCell = c;
+                  isCreatePointer = true;
+                  initialCell = c;
                 } else {
-                  if (newListB.isOn(mouseX, mouseY)) {} else {
-                    Cells.push(new List(mouseX, mouseY, "NIL", DRAWING_COLOR));
+                  c = isOnHeadValue(mouseX, mouseY);
+                  if (c != null) {
+                    isDraggingCell = true;
+                    draggingCell = c;
+                  } else {
+                    if (newListB.isOn(mouseX, mouseY)) {} else {
+                      Cells.push(new List(mouseX, mouseY, "NIL", DRAWING_COLOR));
+                    }
                   }
                 }
               }
@@ -188,6 +209,14 @@ function mousePressed() {
       SelectedCells = [c];
     } else {
       SelectedCells = [];
+    }
+    c = isOnHeadPointer(mouseX, mouseY);
+    if (c != null) {
+      c.select();
+    }
+    c = isOnHeadValue(mouseX, mouseY);
+    if (c != null) {
+      c.select();
     }
   }
 
@@ -217,6 +246,7 @@ function mouseReleased() {
   } else {
     if (newListB.isOn(mouseX, mouseY)) {
       Heads.push(new Head(floor(random(50, width - 50)), floor(random(50, height - 50)), "L" + (Heads.length + 1), DRAWING_COLOR))
+      newListB.t = " L" + (Heads.length + 1) + " = listechainee() "
     }
   }
 
@@ -271,10 +301,10 @@ function showLinks() {
   for (let c of Cells) {
     if (c.next != null) {
       let color = DRAWING_COLOR;
-      if (SelectedCells.includes(c)) {
-        color = ALERT_COLOR;
-      } else if (ResultCells.includes(c) || ResultCellsNexts.includes(c)) {
+      if (ResultCells.includes(c) || ResultCellsNexts.includes(c)) {
         color = RESULT_COLOR;
+      } else if (SelectedCells.includes(c)) {
+        color = ALERT_COLOR;
       }
       c.drawLinkTo(c.next.anchorLeftX, c.next.anchorLeftY + c.next.h / 2, color, c.x, c.y);
     }
@@ -302,19 +332,20 @@ function isOnHeadValue(x, y) {
 
 function showCells() {
   for (let c of Cells) {
-    if (SelectedCells.includes(c)) {
-      c.show(ALERT_COLOR);
+    if (ResultCells.includes(c)) {
+      c.show(RESULT_COLOR);
     } else {
-      if (ResultCells.includes(c)) {
-        c.show(RESULT_COLOR);
+      if (SelectedCells.includes(c)) {
+        c.show(ALERT_COLOR);
       } else {
         c.show();
-        if (ResultCellsKeys.includes(c)) {
-          c.showKeyAt(c.x, c.y, RESULT_COLOR);
-        } else {
-          if (ResultCellsNexts.includes(c)) {
-            c.showNextAt(c.x, c.y, RESULT_COLOR);
-          }
+      }
+      if (ResultCellsKeys.includes(c)) {
+        c.showKeyAt(c.x, c.y, RESULT_COLOR);
+      } else {
+        if (ResultCellsNexts.includes(c)) {
+          //c.showNextAt(c.x, c.y, RESULT_COLOR);
+          c.show(RESULT_COLOR);
         }
       }
     }
@@ -322,8 +353,49 @@ function showCells() {
 }
 
 
+function keyPressed() {
+  if (keyCode == BACKSPACE || keyCode == DELETE) {
+    updateCleared();
+  }
+}
+
+
 function showHeads() {
   for (let h of Heads) {
-    h.show();
+    if (SelectedCells.includes(h)) {
+      h.show(ALERT_COLOR);
+    } else {
+      h.show();
+    }
   }
+}
+
+
+
+function updateCleared() {
+  for (let c of Cells) {
+    if (SelectedCells.includes(c.next)) {
+      c.next = null;
+    }
+  }
+
+  for (let h of Heads) {
+    if (SelectedCells.includes(h.next)) {
+      h.next = null;
+    }
+  }
+
+
+  for (let c of SelectedCells) {
+    if (c instanceof List) {
+      Cells.splice(Cells.indexOf(c), 1);
+    }
+    if (c instanceof Head) {
+      Heads.splice(Heads.indexOf(c), 1);
+    }
+  }
+
+
+
+
 }

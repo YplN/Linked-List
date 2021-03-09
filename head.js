@@ -124,5 +124,14 @@ class Head {
     pop();
   }
 
+  select() {
+    SelectedCells = [this];
+    let m = this.next;
+    while (m != null) {
+      SelectedCells.push(m);
+      m = m.next;
+    }
+  }
+
 
 }

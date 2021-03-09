@@ -1,5 +1,5 @@
 class Menu {
-  constructor(x, y, t, l, r) {
+  constructor(x, y, t, l, r, sel) {
     this.x = x;
     this.y = y;
     this.t = t;
@@ -8,6 +8,12 @@ class Menu {
       this.r = "X";
     } else {
       this.r = r;
+    }
+
+    if (sel == null) {
+      this.sel = false;
+    } else {
+      this.sel = true;
     }
 
     let bbox = font.textBounds(t, 0, 0, 20);
@@ -70,11 +76,13 @@ class Menu {
 
     if (!this.isOn(mouseX, mouseY)) {
       fill(textColor);
+      text(this.t, x, y + 10);
     } else {
+      textSize(18);
       fill(textColorHover);
+      text(this.t.replace("x", "selection"), x, y + 10);
     }
 
-    text(this.t, x, y + 10);
   }
 
 
@@ -165,5 +173,9 @@ class Menu {
     this.showing = (this.isOn(mouseX, mouseY) || (this.persistantShowing && this.isOnItem(mouseX, mouseY) != null));
     this.persistantShowing = this.showing;
   }
+
+
+
+
 
 }
