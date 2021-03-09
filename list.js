@@ -43,6 +43,7 @@ class List {
 
     // drawing left cell
     fill(color);
+    noStroke();
     rect(anchorLeftX, anchorLeftY, 2 * PADDING + this.vw, this.h, 10, 0, 0, 10); // error with color here?
 
     // drawing text
@@ -58,6 +59,7 @@ class List {
     // drawing link
     if (this.next == null) {
       stroke(color);
+      1
       strokeWeight(2);
 
       if (this != initialCell) {
@@ -76,7 +78,6 @@ class List {
       fill(DRAWING_COLOR);
       circle(x + EMPTY_CELL_W / 2, y, 10);
     }
-
 
     // drawing rectangle
     noFill();
@@ -131,82 +132,6 @@ class List {
 
   isOnValue(x, y) {
     return this.isOn(x, y) && !this.isOnPointer(x, y);
-  }
-
-
-  setPositionAt(x, y) {
-    this.x = x;
-    this.y = y;
-  }
-
-
-}
-
-
-
-
-
-
-
-
-class Head {
-  constructor(x, y, v, c) {
-    this.x = x;
-    this.y = y;
-    this.color = c;
-    this.v = v;
-    this.next = null;
-
-    let bbox = font.textBounds(v + "", 0, 0, HEAD_TEXT_SIZE);
-    this.vw = bbox.w;
-    this.vh = bbox.h;
-
-    this.w = 2 * PADDING + this.vw; // 2*padding + size value + size pointer cell
-    this.h = 2 * PADDING + this.vh;
-  }
-
-  updateValue(v) {
-    this.v = v;
-    let bbox = font.textBounds(v + "", 0, 0, HEAD_TEXT_SIZE);
-    this.vw = bbox.w;
-    this.vh = bbox.h;
-
-    this.w = 2 * PADDING + this.vw; // 2*padding + size value + size pointer cell
-    this.h = 2 * PADDING + this.vh;
-  }
-
-  show(c) {
-    this.showAt(this.x, this.y, c);
-  }
-
-  showAt(x, y, c) {
-    let color = this.color;
-    if (c != null)
-      color = c;
-
-    let anchorLeftX = x - PADDING - this.vw / 2;
-    let anchorLeftY = y - PADDING - this.vh / 2;
-
-    // drawing cell
-    fill(BACKGROUND);
-    rect(anchorLeftX, anchorLeftY, this.w, this.h);
-
-    // drawing text
-    fill(color);
-    noStroke();
-    textAlign(CENTER, BASELINE);
-    textSize(HEAD_TEXT_SIZE);
-    text(this.v, this.x, this.y + this.vh / 2);
-  }
-
-
-  setNext(L) {
-    this.next = L;
-  }
-
-
-  isOn(x, y) {
-    return (abs(this.x - x) <= this.w / 2 && abs(y - this.y) <= this.h / 2);
   }
 
 

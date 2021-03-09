@@ -106,6 +106,12 @@ class ResetTile extends Tile {
 
 class NewListTile extends Tile {
   constructor(x, y, t) {
-    super(x, y, "L = liste()");
+    super(x, y, "L = listechainee()");
+  }
+}
+
+class NewNodeTile extends Tile {
+  constructor(x, y, t) {
+    super(x, y, "maillon()");
   }
 }
