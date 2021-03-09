@@ -20,12 +20,14 @@ let Heads = [];
 
 let SelectedCells = [];
 let ResultCells = [];
+let ResultCellsKeys = [];
+let ResultCellsNexts = [];
 
 let newListB;
 let newNodeB;
 
 
-let menuCells;
+let menuHeads;
 
 
 // function to disable default menu on right click
@@ -70,10 +72,12 @@ function setup() {
   Heads[0].setNext(Cells[0]);
   Heads[1].setNext(Cells[4]);
 
-  newListB = new NewListTile(width / 2, height - 50);
-  newNodeB = new NewNodeTile(width / 2 + 200, height - 50);
+  newListB = new NewListTile(width / 2, height - 20);
+  newNodeB = new NewNodeTile(width / 2 + 200, height + 50);
 
-  menuCells = new Menu(200, height - 50, " tête[L] ", Heads);
+  menuHeads = new Menu(80, height - 20, "      tête[L]      ", Heads, "tête[X]");
+  menuKey = new Menu(menuHeads.x + menuHeads.w / 2 + 78, height - 20, "      cle[x]      ", Heads, "cle[tête[X]]");
+  menuNext = new Menu(menuKey.x + menuKey.w / 2 + 84, height - 20, "      succ[x]      ", Heads, "succ[tête[X]]");
 }
 
 function draw() {
@@ -82,24 +86,50 @@ function draw() {
 
   showCells();
   showHeads();
+
   if (isCreatePointer) {
-    initialCell.drawLinkTo(mouseX, mouseY, initialCell.color);
+    initialCell.drawLinkTo(mouseX, mouseY, initialCell.color, initialCell.x, initialCell.y);
   }
 
+  showLinks();
+
+
+
   isOnHeadValue(mouseX, mouseY);
-  menuCells.isShowing(mouseX, mouseY);
-  menuCells.show();
+  menuHeads.isShowing(mouseX, mouseY);
+  menuNext.isShowing(mouseX, mouseY);
+  menuKey.isShowing(mouseX, mouseY);
+  menuHeads.show();
+  menuKey.show();
+  menuNext.show();
   newListB.show();
   newNodeB.show();
 }
 
 function updateResult(x, y) {
-  let i = menuCells.isOnItem(mouseX, mouseY);
-  if (menuCells.showing && i != null && menuCells.isShowing) {
-    ResultCells = [menuCells.l[i].next];
+  let i = menuHeads.isOnItem(mouseX, mouseY);
+  if (menuHeads.showing && i != null && menuHeads.isShowing) {
+    ResultCells = [menuHeads.l[i].next];
   } else {
     ResultCells = [];
   }
+
+
+  i = menuKey.isOnItem(mouseX, mouseY);
+  if (menuKey.showing && i != null && menuKey.isShowing) {
+    ResultCellsKeys = [menuKey.l[i].next];
+  } else {
+    ResultCellsKeys = [];
+  }
+
+  i = menuNext.isOnItem(mouseX, mouseY);
+  if (menuNext.showing && i != null && menuNext.isShowing) {
+    ResultCellsNexts = [menuNext.l[i].next];
+  } else {
+    ResultCellsNexts = [];
+  }
+
+
 }
 
 function windowResized() {
@@ -109,32 +139,42 @@ function windowResized() {
 function mousePressed() {
 
   if (mouseButton == LEFT) {
-    let i = menuCells.isOnItem(mouseX, mouseY);
-    if (menuCells.showing && i != null && menuCells.isShowing) {
-      SelectedCells = [menuCells.l[i].next];
+    let i = menuHeads.isOnItem(mouseX, mouseY);
+    if (menuHeads.showing && i != null && menuHeads.isShowing) {
+      SelectedCells = [menuHeads.l[i].next];
     } else {
-      let c = isOnValueCell(mouseX, mouseY);
-      if (c != null) {
-        isDraggingCell = true;
-        draggingCell = c;
+      i = menuKey.isOnItem(mouseX, mouseY);
+      if (menuKey.showing && i != null && menuKey.isShowing) {
+        SelectedCells = [];
       } else {
-        c = isOnPointerCell(mouseX, mouseY);
-        if (c != null) {
-          isCreatePointer = true;
-          initialCell = c;
+        i = menuNext.isOnItem(mouseX, mouseY);
+        if (menuNext.showing && i != null && menuNext.isShowing) {
+          SelectedCells = [];
         } else {
-          c = isOnHeadPointer(mouseX, mouseY);
+          let c = isOnValueCell(mouseX, mouseY);
           if (c != null) {
-            isCreatePointer = true;
-            initialCell = c;
+            isDraggingCell = true;
+            draggingCell = c;
           } else {
-            c = isOnHeadValue(mouseX, mouseY);
+            c = isOnPointerCell(mouseX, mouseY);
             if (c != null) {
-              isDraggingCell = true;
-              draggingCell = c;
+              isCreatePointer = true;
+              initialCell = c;
             } else {
-              if (newListB.isOn(mouseX, mouseY)) {} else {
-                Cells.push(new List(mouseX, mouseY, "NIL", DRAWING_COLOR));
+              c = isOnHeadPointer(mouseX, mouseY);
+              if (c != null) {
+                isCreatePointer = true;
+                initialCell = c;
+              } else {
+                c = isOnHeadValue(mouseX, mouseY);
+                if (c != null) {
+                  isDraggingCell = true;
+                  draggingCell = c;
+                } else {
+                  if (newListB.isOn(mouseX, mouseY)) {} else {
+                    Cells.push(new List(mouseX, mouseY, "NIL", DRAWING_COLOR));
+                  }
+                }
               }
             }
           }
@@ -176,7 +216,7 @@ function mouseReleased() {
 
   } else {
     if (newListB.isOn(mouseX, mouseY)) {
-      Heads.push(new Head(floor(random(0, width)), floor(random(0, height)), "L" + (Heads.length + 1), DRAWING_COLOR))
+      Heads.push(new Head(floor(random(50, width - 50)), floor(random(50, height - 50)), "L" + (Heads.length + 1), DRAWING_COLOR))
     }
   }
 
@@ -227,6 +267,22 @@ function isOnCell(x, y) {
 }
 
 
+function showLinks() {
+  for (let c of Cells) {
+    if (c.next != null) {
+      let color = DRAWING_COLOR;
+      if (SelectedCells.includes(c)) {
+        color = ALERT_COLOR;
+      } else if (ResultCells.includes(c) || ResultCellsNexts.includes(c)) {
+        color = RESULT_COLOR;
+      }
+      c.drawLinkTo(c.next.anchorLeftX, c.next.anchorLeftY + c.next.h / 2, color, c.x, c.y);
+    }
+  }
+
+}
+
+
 function isOnHeadPointer(x, y) {
   for (let h of Heads) {
     if (h.isOnPointer(x, y)) {
@@ -253,6 +309,13 @@ function showCells() {
         c.show(RESULT_COLOR);
       } else {
         c.show();
+        if (ResultCellsKeys.includes(c)) {
+          c.showKeyAt(c.x, c.y, RESULT_COLOR);
+        } else {
+          if (ResultCellsNexts.includes(c)) {
+            c.showNextAt(c.x, c.y, RESULT_COLOR);
+          }
+        }
       }
     }
   }

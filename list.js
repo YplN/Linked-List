@@ -17,6 +17,9 @@ class List {
 
     this.w = 2 * PADDING + this.vw + EMPTY_CELL_W; // 2*padding + size value + size pointer cell
     this.h = 2 * PADDING + this.vh;
+
+    this.anchorLeftX = x - 2 * PADDING - this.vw;
+    this.anchorLeftY = y - PADDING - this.vh / 2;
   }
 
   updateValue(v) {
@@ -27,24 +30,20 @@ class List {
 
     this.w = 2 * PADDING + this.vw + EMPTY_CELL_W; // 2*padding + size value + size pointer cell
     this.h = 2 * PADDING + this.vh;
+
+    this.anchorLeftX = this.x - 2 * PADDING - this.vw;
+    this.anchorLeftY = this.y - PADDING - this.vh / 2;
   }
 
   show(c) {
     this.showAt(this.x, this.y, c);
   }
 
-  showAt(x, y, c) {
-    let color = this.color;
-    if (c != null)
-      color = c;
-
-    let anchorLeftX = x - 2 * PADDING - this.vw;
-    let anchorLeftY = y - PADDING - this.vh / 2;
-
+  showKeyAt(x, y, mcolor) {
     // drawing left cell
-    fill(color);
+    fill(mcolor);
     noStroke();
-    rect(anchorLeftX, anchorLeftY, 2 * PADDING + this.vw, this.h, 10, 0, 0, 10); // error with color here?
+    rect(this.anchorLeftX, this.anchorLeftY, 2 * PADDING + this.vw, this.h, 10, 0, 0, 10);
 
     // drawing text
     fill(BACKGROUND);
@@ -54,12 +53,12 @@ class List {
     let textX = x - PADDING - this.vw / 2;
     let textY = y + this.vh / 2;
     text(this.v, textX, textY);
+  }
 
 
-    // drawing link
+  showNextAt(x, y, mcolor) {
     if (this.next == null) {
-      stroke(color);
-      1
+      stroke(mcolor);
       strokeWeight(2);
 
       if (this != initialCell) {
@@ -70,20 +69,28 @@ class List {
       }
 
     } else {
-
-      let otherCellX = this.next.x - 2 * PADDING - this.next.vw;
-      let otherCellY = this.next.y;
-
-      this.drawLinkTo(otherCellX, otherCellY, color, x, y);
-      fill(DRAWING_COLOR);
-      circle(x + EMPTY_CELL_W / 2, y, 10);
+      // links shown in another function
     }
+  }
+
+  showAt(x, y, c) {
+    let color = this.color;
+    if (c != null)
+      color = c;
+
+
+    // drawing key
+    this.showKeyAt(x, y, color);
+
+    // drawing link
+    this.showNextAt(x, y, color);
+
 
     // drawing rectangle
     noFill();
     stroke(color);
     strokeWeight(2);
-    rect(anchorLeftX, anchorLeftY, this.w, this.h, 10, 0, 0, 10);
+    rect(this.anchorLeftX, this.anchorLeftY, this.w, this.h, 10, 0, 0, 10);
   }
 
   drawLinkTo(otherCellX, otherCellY, color, x, y) {
@@ -96,11 +103,11 @@ class List {
       let thisCellY = y;
     }
 
-    //drawing link
-    stroke(color);
-    strokeWeight(2);
-    line(thisCellX, thisCellY, otherCellX, otherCellY);
 
+    //drawing link
+    stroke(BACKGROUND);
+    strokeWeight(4);
+    line(thisCellX, thisCellY, otherCellX, otherCellY);
 
     // drawing arrow
     angleMode(RADIANS);
@@ -111,9 +118,25 @@ class List {
     fill(color);
     rotate(angle - HALF_PI); //rotates the arrow point
     let offset = 10; // size of arrow
-    let adjust = 5; //
+    let adjust = 2; //
+    stroke(BACKGROUND);
+    strokeWeight(1);
     triangle(-offset * 0.5, offset + adjust, offset * 0.5, offset + adjust, 0, -offset / 2 + adjust); //draws the arrow point as a triangle
     pop();
+
+
+
+    //drawing link
+    stroke(color);
+    strokeWeight(2);
+    line(thisCellX, thisCellY, otherCellX, otherCellY);
+
+    fill(color);
+    noStroke();
+    circle(x + EMPTY_CELL_W / 2, y, 10);
+
+
+
   }
 
 
@@ -138,6 +161,8 @@ class List {
   setPositionAt(x, y) {
     this.x = x;
     this.y = y;
+    this.anchorLeftX = x - 2 * PADDING - this.vw;
+    this.anchorLeftY = y - PADDING - this.vh / 2;
   }
 
 

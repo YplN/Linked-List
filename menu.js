@@ -1,9 +1,14 @@
 class Menu {
-  constructor(x, y, t, l) {
+  constructor(x, y, t, l, r) {
     this.x = x;
     this.y = y;
     this.t = t;
     this.l = l;
+    if (r == null) {
+      this.r = "X";
+    } else {
+      this.r = r;
+    }
 
     let bbox = font.textBounds(t, 0, 0, 20);
     this.w = bbox.w + 20;
@@ -134,7 +139,7 @@ class Menu {
     textSize(20);
     fill(textColor);
     noStroke();
-    text(this.l[i].v, x, y + 10 + (i + 1) * d * this.h);
+    text(this.r.replace("X", this.l[i].v), x, y + 10 + (i + 1) * d * this.h);
 
 
 
@@ -150,7 +155,7 @@ class Menu {
       fill(textColorHover);
     }
 
-    text(this.l[i].v, x, y + 10 + (i + 1) * d * this.h);
+    text(this.r.replace("X", this.l[i].v), x, y + 10 + (i + 1) * d * this.h);
 
   }
 
