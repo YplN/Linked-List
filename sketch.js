@@ -125,7 +125,11 @@ function updateResult(x, y) {
 
   i = menuNext.isOnItem(mouseX, mouseY);
   if (menuNext.showing && i != null && menuNext.isShowing) {
-    ResultCellsNexts = [menuNext.l[i].next];
+    if (menuNext.l[i].next != null)
+      ResultCellsNexts = [menuNext.l[i].next.next];
+    else {
+      ResultCellsNexts = [];
+    }
   } else {
     ResultCellsNexts = [];
   }
