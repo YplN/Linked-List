@@ -67,7 +67,7 @@ function setup() {
   Heads[1].setNext(Cells[4]);
 
 
-  menuHeads = new Menu(80, height - 20, "      tête[L]      ", Heads, "tête[X]");
+  menuHeads = new Menu(width / 2 - 300, height - 20, "      tête[L]      ", Heads, "tête[X]");
   menuKey = new Menu(menuHeads.x + menuHeads.w / 2 + 78, height - 20, "      cle[x]      ", Heads, "cle[tête[X]]");
   menuNext = new Menu(menuKey.x + menuKey.w / 2 + 84, height - 20, "      succ[x]      ", Heads, "succ[tête[X]]");
 
@@ -92,6 +92,9 @@ function draw() {
   showLinks();
 
 
+  fill(DRAWING_COLOR);
+  noStroke();
+  rect(0, height - 40, width, 40);
 
   isOnHeadValue(mouseX, mouseY);
   menuHeads.isShowing(mouseX, mouseY);
