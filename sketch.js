@@ -252,8 +252,8 @@ function mouseReleased() {
 
   } else {
     if (newListB.isOn(mouseX, mouseY)) {
-      Heads.push(new Head(floor(random(50, width - 50)), floor(random(50, height - 50)), "L" + (Heads.length + 1), DRAWING_COLOR))
-      newListB.t = " L" + (Heads.length + 1) + " = listechainee() "
+      Heads.push(new Head(floor(random(50, width - 50)), floor(random(50, height - 50)), "L" + getNewListName(), DRAWING_COLOR))
+      newListB.t = " L" + getNewListName() + " = listechainee() "
     }
   }
 
@@ -363,6 +363,7 @@ function showCells() {
 function keyPressed() {
   if (keyCode == BACKSPACE || keyCode == DELETE) {
     updateCleared();
+    newListB.t = " L" + getNewListName() + " = listechainee() "
   }
 }
 
@@ -401,8 +402,18 @@ function updateCleared() {
       Heads.splice(Heads.indexOf(c), 1);
     }
   }
+}
 
 
-
-
+function getNewListName() {
+  for (var i = 1; i <= Heads.length + 1; i++) {
+    j = 0;
+    while (j < Heads.length && Heads[j].v.substr(1) != (i + "")) {
+      j++;
+    }
+    if (j == Heads.length) {
+      return (i + "");
+    }
+  }
+  return "ERROR";
 }
